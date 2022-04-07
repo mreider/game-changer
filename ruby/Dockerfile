@@ -1,4 +1,4 @@
-FROM ruby:3.15
+FROM docker-library/ruby:3.15
 ENV INSTALL_PATH /app
 RUN mkdir -p $INSTALL_PATH
 COPY Gemfile Gemfile.lock ./
