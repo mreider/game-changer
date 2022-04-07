@@ -1,0 +1,35 @@
+on: 
+  push:
+      branches:
+        - main
+jobs:
+  build-and-publish:
+    name: Build and Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.3.2
+        name: Check out code
+        with:
+          ref: '${{ github.event.inputs.branch}}'
+      - uses: mr-smithers-excellent/docker-build-push@v5
+        name: Build and publish image
+        with:
+          image: gamechanger
+          tags: ${{ github.run_number }},latest
+          registry: ghcr.io
+          githubOrg: mreider
+          username: ${{ github.actor }}
+          password: ${{ secrets.GH_TOKEN }}
+          directory: ./ruby
+          dockerfile: ./ruby/Dockerfile
+      - name: Run kustomize
+        run: |
+          kustomize edit set image ghcr.io/mreider/gamechanger=ghcr.io/mreider/gamechanger:${{ github.run_number }}
+          kustomize build -o installer/kubernetes.yaml
+      - name: Update deployment files
+        uses: test-room-7/action-update-file@v1
+        with:
+          file-path: |
+            installer/kubernetes.yaml
+          commit-msg: image tag update to ${{ github.run_number }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
