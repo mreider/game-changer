@@ -8,7 +8,7 @@ config.read('config.ini')
 config.sections()
 instructions = "Install to host '$g h' or kubernetes '$g k'"
 parser = argparse.ArgumentParser(description='install things')
-parser.add_argument('mode', type=str, required=True)
+parser.add_argument('mode', type=str)
 args = parser.parse_args()
 def is_tool(name):
     """Check whether `name` is on PATH."""
@@ -19,8 +19,11 @@ if args.mode:
             pid = config['HOST']['project_id']
             zone = config['HOST']['zone']
             vm = config['HOST']['vm_name']
-            command = "bash <(curl -s https://raw.githubusercontent.com/mreider/game-changer/main/installer/run.sh)"
-            subprocess.call(['gcloud', 'compute', f'--project={pid}','ssh', vm, f'--zone={zone}', f'--command={command}'], shell=True)
+            #file_path_coded = subprocess.run(['which', 'gcloud'], stdout=subprocess.PIPE)
+            #file_path = file_path_coded.stdout.decode('utf-8').rstrip()
+            command = "'bash <(curl -s https://raw.githubusercontent.com/mreider/game-changer/main/installer/run.sh)'"
+            gcloud_command = "gcloud compute --project=" + pid + " ssh " + vm+ " --zone=" + zone + " --command=" + command
+            subprocess.run([gcloud_command],shell=True)
         else:
             print("gcloud must be installed and configured")
     elif args.mode == "k":
