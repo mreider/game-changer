@@ -1,5 +1,6 @@
 sudo apt-get install git -y
 sudo apt-get install redis -y
+sudo sed -e 's/\redis//g' /etc/hosts > /etc/hosts
 sudo sed -i '/^127\.0\.0\.1\s/s/$/ '"redis"'/' /etc/hosts
 redis-server &
 curl -OL https://go.dev/dl/go1.18.linux-amd64.tar.gz
